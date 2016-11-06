@@ -207,7 +207,6 @@ public class PokemonUI extends Dialog {
 				j--;
 			}
 			rows[j + 1] = placeHolder;
-			System.out.println("sortRows: swapped element " + i + " with element " + j);
 		}
 	}
 	// again, in-place.

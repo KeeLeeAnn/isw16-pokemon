@@ -10,7 +10,7 @@ import pokemon.data.*;
 import pokemon.ui.PokemonUI;
 
 /**
- * FUNCTIONAL INVASION UNAVOIDABLE
+ * FUN
  * The PokemonManager Class
  */
 public class PokemonManager {
