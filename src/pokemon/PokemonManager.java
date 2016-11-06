@@ -24,6 +24,8 @@ public class PokemonManager {
 		pokemons.get(0).setTrainer(new Trainer("Ash", "Ketchum"));
 		pokemons.add(1, new Pokemon("Nidorina", Type.Poison));
 		pokemons.get(1).setTrainer(new Trainer("Aaron", "Aaronson"));
+		pokemons.add(2, new Pokemon("Arcanine", Type.Fire));
+		pokemons.get(2).setTrainer(new Trainer("Green", "Goblin"));
 		// create a SWT window
 		Display display = new Display();
 		Shell shell = new Shell(display);

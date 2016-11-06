@@ -1,13 +1,10 @@
 package pokemon.ui;
 
-import java.lang.reflect.Field;
-import java.text.Collator;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -134,6 +131,8 @@ public class PokemonUI extends Dialog {
 		// finally, add a listener to the columns that adjusts the sorting order. Same system
 		// used for music files: User clicks a column header and the whole table becomes sorted
 		// by that field. Clicking it again reverses the sorting order.
+		// To sort, we simply create and then sort an array of rows (named @rows@), then create
+		// a matrix of strings representing the 
 		Listener sortListener = new Listener() {
 			public void handleEvent(Event e)
 			{
@@ -143,15 +142,39 @@ public class PokemonUI extends Dialog {
 				if (table.getSortColumn() == column)
 					if (table.getSortDirection() == SWT.UP) {
 						table.setSortDirection(SWT.DOWN);
-						// reverse the rows.
+						String[][] textHolder = extractText(rows);
+						
+						reverse(textHolder);
+						
+						table.removeAll();
+						for (int k = 0; k < textHolder.length; k++) {
+							rows[k] = new TableItem(table, SWT.DEFAULT);
+							rows[k].setText(textHolder[k]);
+						}
 					} else {
-						// set sortDireciton to SWT.UP, reverse the rows.
 						table.setSortDirection(SWT.UP);
+						String[][] textHolder = extractText(rows);
+						
+						reverse(textHolder);
+						
+						table.removeAll();
+						for (int k = 0; k < textHolder.length; k++) {
+							rows[k] = new TableItem(table, SWT.DEFAULT);
+							rows[k].setText(textHolder[k]);
+						}
 					}
 				else {
 					table.setSortDirection(SWT.UP);
 					table.setSortColumn(column);
-					// sort the column ascendingly
+
+					sortRows(columnIndex, rows);
+					
+					String[][] textHolder = extractText(rows);
+					table.removeAll();
+					for (int k = 0; k < textHolder.length; k++) {
+						rows[k] = new TableItem(table, SWT.DEFAULT);
+						rows[k].setText(textHolder[k]);
+					}
 				}
 			}
 		};
@@ -159,37 +182,56 @@ public class PokemonUI extends Dialog {
 			columns[i].addListener(SWT.Selection, sortListener);
 	}
 	
-// TODO: Figure out this sorting business
-	// We can't sort the array in place, since creating new @TableItem@s instantly adds
-	// them to the table and we want to wait. The solution is to create an array of string[]s
-	// storing each row, and from which we make the new table afterward.
-	public String[][] newRowOrder(int column, TableItem[] rows)
+	String[][] extractText(TableItem[] rows)
 	{
-		int columnCount = rows[0].getParent().getColumns().length;
-		String[][] newRows = new String[rows.length][];
-		for (int rowIndex = 0; rowIndex < rows.length; rowIndex++)
-			newRows[rowIndex] = rowToStrings(columnCount, rows[rowIndex]);
-		return newRows;
+		String[][] rowTexts = new String[rows.length][rows[0].getParent().getColumnCount()];
+		for (int i = 0; i < rowTexts.length; i++) {
+			for (int j = 0; j < rowTexts[i].length; j++)
+				rowTexts[i][j] = rows[i].getText(j);
+		}
+		return rowTexts;
+	}
+	// We're just going to, uh... *hope* that nobody tries to use large tables, since this uses
+	// InsertionSort. It's in-place, by the way, so be careful.
+	public void sortRows(int column, TableItem[] rows)
+	{
+		TableItem placeHolder;
+		int i, j;
+		for (i = 0; i < rows.length; i++) {
+			placeHolder = rows[i];
+			j = i - 1;
+			// sorry about this, the next line is the args to @compareIgnoreCase@.
+			while (j >= 0 && rows[j].getText(column).compareToIgnoreCase
+					(placeHolder.getText(column)) >= 1) {
+				rows[j + 1] = rows[j];
+				j--;
+			}
+			rows[j + 1] = placeHolder;
+			System.out.println("sortRows: swapped element " + i + " with element " + j);
+		}
+	}
+	// again, in-place.
+	public <T> void reverse(T[] rows)
+	{
+		T holder;
+		for (int i = 0; i < rows.length / 2; i++) {
+			holder = rows[i];
+			rows[i] = rows[rows.length - i - 1];
+			rows[rows.length - i - 1] = holder;
+		}
 	}
 	
-	// Simply returns a string array containing, in order, each of the labels in the TableItem.
-	String[] rowToStrings(int columnCount, TableItem row)
-	{
-		String[] rowString = new String[columnCount];
-		for (int i = 0; i < columnCount; i++) {
-			rowString[i] = row.getText(i);
-		}
-		return rowString;
-	}
+
 	/**
-	 * Create table headers String
+	 * Instructions unclear, code stuck in loop. Welche header sollen wir denn hier getten?
+	 * Die von oben auf den Spalten, oder von einer einzelnen Zeile?
 	 * 
 	 * @return
 	 */
-	private List<String> getTableHeaders() {
-		List<String> ret = new ArrayList<String>();
-		// TODO: Create the headers for the Table based on Pokemon attributes  
-		return ret;
-	}
+//	private List<String> getTableHeaders() {
+//		List<String> ret = new ArrayList<String>();
+//		// Create the headers for the Table based on Pokemon attributes  
+//		return ret;
+//	}
 
 }
